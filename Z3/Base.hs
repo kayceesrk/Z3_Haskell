@@ -61,6 +61,8 @@ module Z3.Base (
   , mkArraySort
   , mkTupleSort
   , mkConstructor
+  , delConstructor
+  , mkDatatype
 
   -- * Constants and Applications
   , mkFuncDecl
@@ -566,6 +568,32 @@ mkConstructor c sym recog symSortsRefs = checkError c $
   where
     maybeUnSort (Just sort) = unSort sort
     maybeUnSort Nothing = nullPtr
+
+
+-- | Reclaim memory allocated to constructor
+--
+-- Reference <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga63816efdbce93734c72f395b6a6a9e35>
+delConstructor :: Context
+               -> Constructor
+               -> IO ()
+delConstructor c cons = checkError c $ z3_del_constructor (unContext c)
+                                                          (unConstructor cons)
+
+-- | Create datatype, such as lists, trees, records, enumerations or unions of
+-- | records. The datatype may be recursive. Return the datatype sort.
+--
+-- Reference <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#gab6809d53327d807da9158abdf75df387>
+mkDatatype :: Context
+           -> Symbol
+           -> [Constructor]
+           -> IO Sort
+mkDatatype c sym consList = checkError c $
+  withArrayLen (map unConstructor consList) $ \ n consPtr -> do
+    sort <- checkError c $ z3_mk_datatype (unContext c)
+                           (unSymbol sym) (fromIntegral n)
+                           consPtr
+    return $ Sort sort
+
 
 -- TODO Sorts: from Z3_mk_array_sort on
 
