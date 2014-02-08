@@ -60,6 +60,7 @@ module Z3.Base (
   , mkBvSort
   , mkArraySort
   , mkTupleSort
+  , mkConstructor
 
   -- * Constants and Applications
   , mkFuncDecl
@@ -289,6 +290,10 @@ newtype App = App { unApp :: Ptr Z3_app }
 -- | A kind of AST used to represent pattern and multi-patterns used to
 --   guide quantifier instantiation.
 newtype Pattern = Pattern { unPattern :: Ptr Z3_pattern }
+    deriving (Eq, Ord, Show, Storable)
+
+-- | A type contructor for a (recursive) datatype.
+newtype Constructor = Constructor { unConstructor :: Ptr Z3_constructor }
     deriving (Eq, Ord, Show, Storable)
 
 -- | A model for the constraints asserted into the logical context.
@@ -540,6 +545,27 @@ mkTupleSort c sym symSorts = checkError c $
        outProjs  <- peekArray n outProjsPtr
        return (Sort sort, FuncDecl outConstr, map FuncDecl outProjs)
 
+-- | Create a contructor
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#gaa779e39f7050b9d51857887954b5f9b0>
+mkConstructor :: Context                      -- ^ Context
+              -> Symbol                       -- ^ Name of the sonstructor
+              -> Symbol                       -- ^ Name of recognizer function
+              -> [(Symbol, Maybe Sort, Int)]  -- ^ Name, sort option, and sortRefs
+              -> IO Constructor
+mkConstructor c sym recog symSortsRefs = checkError c $
+  let (syms, maybeSorts, refs) = unzip3 symSortsRefs
+  in withArrayLen (map unSymbol syms) $ \ n symsPtr ->
+     withArray (map maybeUnSort maybeSorts) $ \ sortsPtr ->
+     withArray (map fromIntegral refs) $ \ refsPtr -> do
+       constructor <- checkError c $ z3_mk_constructor
+                        (unContext c) (unSymbol sym)
+                        (unSymbol recog) (fromIntegral n)
+                        symsPtr sortsPtr refsPtr
+       return $ Constructor constructor
+  where
+    maybeUnSort (Just sort) = unSort sort
+    maybeUnSort Nothing = nullPtr
 
 -- TODO Sorts: from Z3_mk_array_sort on
 

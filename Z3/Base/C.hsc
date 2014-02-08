@@ -51,6 +51,9 @@ data Z3_app
 -- guide quantifier instantiation.
 data Z3_pattern
 
+-- | A type constructor for a (recursive) datatype.
+data Z3_constructor
+
 -- | A model for the constraints asserted into the logical context.
 data Z3_model
 
@@ -228,6 +231,19 @@ foreign import ccall unsafe "Z3_mk_tuple_sort"
                      -> IO (Ptr Z3_sort)
 
 -- TODO Sorts: from Z3_mk_array_sort on
+
+-- | Create a constructor
+--
+-- Reference <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#gaa779e39f7050b9d51857887954b5f9b0>
+foreign import ccall unsafe "Z3_mk_constructor"
+    z3_mk_constructor :: Ptr Z3_context
+                      -> Ptr Z3_symbol
+                      -> Ptr Z3_symbol
+                      -> CUInt
+                      -> Ptr (Ptr Z3_symbol)
+                      -> Ptr (Ptr Z3_sort)
+                      -> Ptr CUInt
+                      -> IO (Ptr Z3_constructor)
 
 
 ---------------------------------------------------------------------
