@@ -26,6 +26,7 @@ module Z3.Base (
   , FuncDecl
   , App
   , Pattern
+  , Constructor
   , Model
   , FuncInterp
   , FuncEntry
@@ -551,7 +552,7 @@ mkTupleSort c sym symSorts = checkError c $
 --
 -- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#gaa779e39f7050b9d51857887954b5f9b0>
 mkConstructor :: Context                      -- ^ Context
-              -> Symbol                       -- ^ Name of the sonstructor
+              -> Symbol                       -- ^ Name of the constructor
               -> Symbol                       -- ^ Name of recognizer function
               -> [(Symbol, Maybe Sort, Int)]  -- ^ Name, sort option, and sortRefs
               -> IO Constructor
@@ -580,7 +581,7 @@ delConstructor c cons = checkError c $ z3_del_constructor (unContext c)
                                                           (unConstructor cons)
 
 -- | Create datatype, such as lists, trees, records, enumerations or unions of
--- | records. The datatype may be recursive. Return the datatype sort.
+--   records. The datatype may be recursive. Return the datatype sort.
 --
 -- Reference <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#gab6809d53327d807da9158abdf75df387>
 mkDatatype :: Context

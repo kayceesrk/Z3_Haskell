@@ -33,6 +33,7 @@ module Z3.Monad
   , FuncDecl
   , App
   , Pattern
+  , Constructor
   , Model
   , Base.Context
   , FuncInterp
@@ -59,6 +60,9 @@ module Z3.Monad
   , mkBvSort
   , mkArraySort
   , mkTupleSort
+  , mkConstructor
+  , delConstructor
+  , mkDatatype
 
   -- * Constants and Applications
   , mkFuncDecl
@@ -215,6 +219,7 @@ import Z3.Base
   , FuncDecl
   , App
   , Pattern
+  , Constructor
   , Model
   , FuncInterp
   , FuncEntry
@@ -394,6 +399,36 @@ mkTupleSort :: MonadZ3 z3
                                                -- declarations for the
                                                -- constructor and projections.
 mkTupleSort = liftFun2 Base.mkTupleSort
+
+
+-- | Create a contructor
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#gaa779e39f7050b9d51857887954b5f9b0>
+mkConstructor :: MonadZ3 z3
+              => Symbol                       -- ^ Name of the sonstructor
+              -> Symbol                       -- ^ Name of recognizer function
+              -> [(Symbol, Maybe Sort, Int)]  -- ^ Name, sort option, and sortRefs
+              -> z3 Constructor
+mkConstructor = liftFun3 Base.mkConstructor
+
+-- | Reclaim memory allocated to constructor
+--
+-- Reference <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga63816efdbce93734c72f395b6a6a9e35>
+delConstructor :: MonadZ3 z3
+               => Constructor
+               -> z3 ()
+delConstructor = liftFun1 Base.delConstructor
+
+-- | Create datatype, such as lists, trees, records, enumerations or unions of
+--   records. The datatype may be recursive. Return the datatype sort.
+--
+-- Reference <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#gab6809d53327d807da9158abdf75df387>
+mkDatatype :: MonadZ3 z3
+           => Symbol
+           -> [Constructor]
+           -> z3 Sort
+mkDatatype = liftFun2 Base.mkDatatype
+
 
 ---------------------------------------------------------------------
 -- Constants and Applications

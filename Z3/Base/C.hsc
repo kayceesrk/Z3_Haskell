@@ -253,7 +253,7 @@ foreign import ccall unsafe "Z3_del_constructor"
 
 
 -- | Create datatype, such as lists, trees, records, enumerations or unions of
--- | records. The datatype may be recursive. Return the datatype sort.
+--   records. The datatype may be recursive. Return the datatype sort.
 --
 -- Reference <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#gab6809d53327d807da9158abdf75df387>
 foreign import ccall unsafe "Z3_mk_datatype"
