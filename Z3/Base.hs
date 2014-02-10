@@ -237,6 +237,9 @@ module Z3.Base (
   , funcDeclToString
   , benchmarkToSMTLibString
 
+  -- * parser
+  , parseSmtlib2String
+
   -- * Error Handling
   , Z3Error(..)
   , Z3ErrorCode(..)
@@ -1869,6 +1872,30 @@ benchmarkToSMTLibString c name logic st attr assump f =
   withAstArray assump $ \numAssump cassump -> liftVal c =<<
     z3_benchmark_to_smtlib_string (unContext c) cname clogic cst cattr
                                   numAssump cassump (unAST f)
+
+---------------------------------------------------------------------
+-- * Parser Interface
+
+-- | Parse the given string using the SMT-LIB2 parser.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga666126cb89d0cc64027e58d13960accf>
+parseSmtlib2String :: Context
+                   -> String                -- ^ String to parse
+                   -> [(Symbol, Sort)]      -- ^ Sort symbols and sorts
+                   -> [(Symbol, FuncDecl)]  -- ^ Function symbols and declarations
+                   -> IO AST                -- ^ Conjunctions of assertions
+parseSmtlib2String c str sortList declList = checkError c $
+  let (sortSyms, sorts) = unzip sortList
+      (declSyms, decls) = unzip declList
+  in withArrayLen (map unSymbol sortSyms) $ \ numSorts sortSymsPtr ->
+     withArray (map unSort sorts) $ \ sortsPtr ->
+     withArrayLen (map unSymbol declSyms) $ \ numDecls declSymsPtr ->
+     withArray (map unFuncDecl decls) $ \ declsPtr ->
+     withCString str $ \ cstr ->
+       AST <$> z3_parse_smtlib2_string (unContext c) cstr
+               (fromIntegral numSorts) sortSymsPtr sortsPtr
+               (fromIntegral numDecls) declSymsPtr declsPtr
+
 
 ---------------------------------------------------------------------
 -- Lifting

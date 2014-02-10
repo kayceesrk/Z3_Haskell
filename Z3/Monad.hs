@@ -210,6 +210,9 @@ module Z3.Monad
   , funcDeclToString
   , solverToString
   , benchmarkToSMTLibString
+
+  -- * Parser
+  , parseSmtlib2String
   )
   where
 
@@ -1210,3 +1213,16 @@ benchmarkToSMTLibString :: MonadZ3 z3 =>
                             -> AST      -- ^ formula
                             -> z3 String
 benchmarkToSMTLibString = liftFun6 Base.benchmarkToSMTLibString
+
+---------------------------------------------------------------------
+-- * Parser Interface
+
+-- | Parse the given string using the SMT-LIB2 parser.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga666126cb89d0cc64027e58d13960accf>
+parseSmtlib2String :: MonadZ3 z3
+                   => String                -- ^ String to parse
+                   -> [(Symbol, Sort)]      -- ^ Sort symbols and sorts
+                   -> [(Symbol, FuncDecl)]  -- ^ Function symbols and declarations
+                   -> z3 AST                -- ^ Conjunctions of assertions
+parseSmtlib2String = liftFun3 Base.parseSmtlib2String

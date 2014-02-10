@@ -1341,6 +1341,23 @@ foreign import ccall unsafe "Z3_benchmark_to_smtlib_string"
                                       -> IO Z3_string
 
 ---------------------------------------------------------------------
+-- * Parser Interface
+
+-- | Parse the given string using the SMT-LIB2 parser.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga666126cb89d0cc64027e58d13960accf>
+foreign import ccall unsafe "Z3_parse_smtlib2_string"
+    z3_parse_smtlib2_string :: Ptr Z3_context
+                            -> Z3_string              -- ^ String to parse
+                            -> CUInt                  -- ^ Number of sorts
+                            -> Ptr (Ptr Z3_symbol)    -- ^ Sort names
+                            -> Ptr (Ptr Z3_sort)      -- ^ Sorts
+                            -> CUInt                  -- ^ Number of declarations
+                            -> Ptr (Ptr Z3_symbol)    -- ^ Declaration names
+                            -> Ptr (Ptr Z3_func_decl) -- ^ Declarations
+                            -> IO (Ptr Z3_ast)        -- ^ Conjunctions of assertions in scope
+
+---------------------------------------------------------------------
 -- * Error Handling
 
 -- | Return the error code for the last API call.
