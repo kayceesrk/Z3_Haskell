@@ -65,6 +65,7 @@ module Z3.Base (
   , delConstructor
   , mkDatatype
 
+
   -- * Constants and Applications
   , mkFuncDecl
   , mkApp
@@ -180,6 +181,9 @@ module Z3.Base (
   , mkExistsConst
 
   -- * Accessors
+  , getDatatypeSortConstructors
+  , getDatatypeSortRecognizers
+  , getDeclName
   , getBvSortSize
   , getSort
   , getBool
@@ -1405,6 +1409,44 @@ mkExistsConst c pats apps p
 
 ---------------------------------------------------------------------
 -- Accessors
+
+-- | Get list of constructors for datatype.
+
+getDatatypeSortConstructors :: Context
+                            -> Sort           -- ^ Datatype sort.
+                            -> IO [FuncDecl]  -- ^ Constructor declarations.
+getDatatypeSortConstructors c dtSort = checkError c $ do
+  numCons <- checkError c $ z3_get_datatype_sort_num_constructors
+                            (unContext c) (unSort dtSort)
+  T.mapM getConstructor [0..(numCons-1)]
+  where
+    getConstructor :: CUInt -> IO FuncDecl
+    getConstructor idx =
+      FuncDecl <$> z3_get_datatype_sort_constructor
+                   (unContext c) (unSort dtSort) idx
+
+-- | Get list of recognizers for datatype.
+
+getDatatypeSortRecognizers :: Context
+                           -> Sort           -- ^ Datatype sort.
+                           -> IO [FuncDecl]  -- ^ Constructor recognizers.
+getDatatypeSortRecognizers c dtSort = checkError c $ do
+  numCons <- checkError c $ z3_get_datatype_sort_num_constructors
+                            (unContext c) (unSort dtSort)
+  T.mapM getConstructor [0..(numCons-1)]
+  where
+    getConstructor :: CUInt -> IO FuncDecl
+    getConstructor idx =
+      FuncDecl <$> z3_get_datatype_sort_recognizer
+                   (unContext c) (unSort dtSort) idx
+
+-- | Return the constant declaration name as a symbol.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga741b1bf11cb92aa2ec9ef2fef73ff129>
+getDeclName :: Context -> FuncDecl -> IO Symbol
+getDeclName c decl = checkError c $
+  Symbol <$> z3_get_decl_name (unContext c) (unFuncDecl decl)
+
 
 -- | Return the size of the given bit-vector sort.
 --

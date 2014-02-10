@@ -165,6 +165,7 @@ module Z3.Monad
   , mkSetMember
   , mkSetSubset
 
+
   -- * Numerals
   , mkNumeral
   , mkInt
@@ -179,11 +180,15 @@ module Z3.Monad
   , mkExistsConst
 
   -- * Accessors
+  , getDatatypeSortConstructors
+  , getDatatypeSortRecognizers
+  , getDeclName
   , getBvSortSize
   , getBool
   , getInt
   , getReal
   , toApp
+
 
   -- * Models
   , eval
@@ -1057,8 +1062,6 @@ mkSetMember = liftFun2 Base.mkSetMember
 mkSetSubset :: MonadZ3 z3 => AST -> AST -> z3 AST
 mkSetSubset = liftFun2 Base.mkSetSubset
 
-
-
 ---------------------------------------------------------------------
 -- Numerals
 
@@ -1105,6 +1108,28 @@ mkExistsConst = liftFun3 Base.mkExistsConst
 
 ---------------------------------------------------------------------
 -- Accessors
+
+-- | Get list of constructors for datatype.
+
+getDatatypeSortConstructors :: MonadZ3 z3
+                            => Sort           -- ^ Datatype sort.
+                            -> z3 [FuncDecl]  -- ^ Constructor declarations.
+getDatatypeSortConstructors = liftFun1 Base.getDatatypeSortConstructors
+
+-- | Get list of recognizers for datatype.
+
+getDatatypeSortRecognizers :: MonadZ3 z3
+                           => Sort           -- ^ Datatype sort.
+                           -> z3 [FuncDecl]  -- ^ Constructor recognizers.
+getDatatypeSortRecognizers = liftFun1 Base.getDatatypeSortRecognizers
+
+-- | Return the constant declaration name as a symbol.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga741b1bf11cb92aa2ec9ef2fef73ff129>
+getDeclName :: MonadZ3 z3
+            => FuncDecl
+            => z3 Symbol
+getDeclName = liftFun1 Base.getDeclName
 
 -- | Return the size of the given bit-vector sort.
 --

@@ -255,13 +255,62 @@ foreign import ccall unsafe "Z3_del_constructor"
 -- | Create datatype, such as lists, trees, records, enumerations or unions of
 --   records. The datatype may be recursive. Return the datatype sort.
 --
--- Reference <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#gab6809d53327d807da9158abdf75df387>
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#gab6809d53327d807da9158abdf75df387>
 foreign import ccall unsafe "Z3_mk_datatype"
     z3_mk_datatype :: Ptr Z3_context
                    -> Ptr Z3_symbol
                    -> CUInt
                    -> Ptr (Ptr Z3_constructor)
                    -> IO (Ptr Z3_sort)
+
+---------------------------------------------------------------------
+-- * Accessors
+
+-- | Return number of constructors for datatype.
+-- 
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#gae9ab82612fd84f5ce7991ade7d7ad920>
+foreign import ccall unsafe "Z3_get_datatype_sort_num_constructors"
+    z3_get_datatype_sort_num_constructors :: Ptr Z3_context
+                                          -> Ptr Z3_sort
+                                          -> IO CUInt
+
+-- | Return idx'th constructor.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#gaa5630cbd0f28d2bda21dc5376fe86a9b>
+foreign import ccall unsafe "Z3_get_datatype_sort_constructor"
+    z3_get_datatype_sort_constructor :: Ptr Z3_context
+                                     -> Ptr Z3_sort
+                                     -> CUInt
+                                     -> IO (Ptr Z3_func_decl)
+
+-- | Return idx'th recognizer.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#gacf79f46d05b3ed69684d47eaf242319c>
+foreign import ccall unsafe "Z3_get_datatype_sort_recognizer"
+    z3_get_datatype_sort_recognizer :: Ptr Z3_context
+                                    -> Ptr Z3_sort
+                                    -> CUInt
+                                    -> IO (Ptr Z3_func_decl)
+
+-- | Return idx_a'th accessor for the idx_c'th constructor.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#gab0ade72138d0479409f47cef21972eb2>
+foreign import ccall unsafe "Z3_get_datatype_sort_constructor_accessor"
+    z3_get_datatype_sort_constructor_accessor :: Ptr Z3_context
+                                              -> Ptr Z3_sort
+                                              -> CUInt
+                                              -> CUInt
+                                              -> IO (Ptr Z3_func_decl)
+
+
+
+-- | Return the constant declaration name as a symbol.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga741b1bf11cb92aa2ec9ef2fef73ff129>
+foreign import ccall unsafe "Z3_get_decl_name"
+    z3_get_decl_name :: Ptr Z3_context
+                     -> Ptr Z3_func_decl
+                     -> IO (Ptr Z3_symbol)
 
 ---------------------------------------------------------------------
 -- * Constants and Applications
