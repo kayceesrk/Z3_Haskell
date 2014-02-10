@@ -164,6 +164,7 @@ module Z3.Base (
   , mkForall
   , mkForallConst
   , mkExists
+  , mkExistsConst
 
   -- * Accessors
   , getBvSortSize
@@ -1272,12 +1273,26 @@ mkExists c pats x s p
   where n    = fromIntegral $ length pats
         cptr = unContext c
         len
-          | l == 0        = error "Z3.Base.mkForall:\
-              \ forall with 0 bound variables"
-          | l /= length x = error "Z3.Base.mkForall:\
+          | l == 0        = error "Z3.Base.mkExists:\
+              \ exists with 0 bound variables"
+          | l /= length x = error "Z3.Base.mkExists:\
               \ different number of symbols and sorts"
           | otherwise     = fromIntegral l
           where l = length s
+
+mkExistsConst :: Context -> [Pattern] -> [App] -> AST -> IO AST
+mkExistsConst c pats apps p
+  = withArray (map unPattern pats) $ \patsPtr ->
+    withArray (map unApp     apps) $ \appsPtr ->
+      checkError c $ liftVal c =<<
+        z3_mk_exists_const cptr 0 len appsPtr n patsPtr (unAST p)
+  where n    = genericLength pats
+        cptr = unContext c
+        len
+          | l == 0        = error "Z3.Base.mkExistsConst:\
+              \ exists with 0 bound variables"
+          | otherwise     = fromIntegral l
+          where l = length apps
 
 ---------------------------------------------------------------------
 -- Accessors

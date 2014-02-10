@@ -163,6 +163,7 @@ module Z3.Monad
   , mkForall
   , mkForallConst
   , mkExists
+  , mkExistsConst
 
   -- * Accessors
   , getBvSortSize
@@ -992,6 +993,9 @@ mkForallConst = liftFun3 Base.mkForallConst
 
 mkExists :: MonadZ3 z3 => [Pattern] -> [Symbol] -> [Sort] -> AST -> z3 AST
 mkExists = liftFun4 Base.mkExists
+
+mkExistsConst :: MonadZ3 z3 => [Pattern] -> [App] -> AST -> z3 AST
+mkExistsConst = liftFun3 Base.mkExistsConst
 
 ---------------------------------------------------------------------
 -- Accessors
