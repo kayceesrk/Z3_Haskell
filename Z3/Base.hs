@@ -153,6 +153,19 @@ module Z3.Base (
   , mkMap
   , mkArrayDefault
 
+  -- * Sets
+  , mkSetSort
+  , mkEmptySet
+  , mkFullSet
+  , mkSetAdd
+  , mkSetDel
+  , mkSetUnion
+  , mkSetIntersect
+  , mkSetDifference
+  , mkSetComplement
+  , mkSetMember
+  , mkSetSubset
+
   -- * Numerals
   , mkNumeral
   , mkInt
@@ -1138,7 +1151,100 @@ mkMap c f n args = withArray (map unAST args) $ \args' ->
 mkArrayDefault :: Context -> AST -> IO AST
 mkArrayDefault = liftFun1 z3_mk_array_default
 
--- TODO Sets
+
+---------------------------------------------------------------------
+-- Sets
+
+-- | Create Set type.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga6865879523e7e882d7e50a2d8445ac8b>
+mkSetSort :: Context
+          -> Sort     -- ^ Sort of domain.
+          -> IO Sort
+mkSetSort = liftFun1 z3_mk_set_sort
+
+-- | Create the empty set.
+--
+-- Referece: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga358b6b80509a567148f1c0ca9252118c>
+mkEmptySet :: Context
+           -> Sort    -- ^ Sort of domain.
+           -> IO AST
+mkEmptySet = liftFun1 z3_mk_empty_set
+
+-- | Create the full set.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga5e92662c657374f7332aa32ce4503dd2>
+mkFullSet :: Context
+          -> Sort     -- ^ Sort of domain.
+          -> IO AST
+mkFullSet = liftFun1 z3_mk_full_set
+
+-- | Add an element to a set.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga856c3d0e28ce720f53912c2bbdd76175>
+mkSetAdd :: Context
+         -> AST     -- ^ Set.
+         -> AST     -- ^ Element.
+         -> IO AST
+mkSetAdd = liftFun2 z3_mk_set_add
+
+-- | Remove an element from a set.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga80e883f39dd3b88f9d0745c8a5b91d1d>
+mkSetDel :: Context
+         -> AST     -- ^ Set.
+         -> AST     -- ^ Element.
+         -> IO AST
+mkSetDel = liftFun2 z3_mk_set_del
+
+-- | Take the union of a list of sets.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga4050162a13d539b8913200963bb4743c>
+mkSetUnion :: Context
+           -> [AST]
+           -> IO AST
+mkSetUnion c setList = checkError c $
+  withArrayLen (map unAST setList) $ \ n astsPtr ->
+    AST <$> z3_mk_set_union (unContext c)
+            (fromIntegral n) astsPtr
+
+-- | Take the intersection of a list of sets.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga4050162a13d539b8913200963bb4743c>
+mkSetIntersect :: Context
+               -> [AST]
+               -> IO AST
+mkSetIntersect c setList = checkError c $
+  withArrayLen (map unAST setList) $ \ n astsPtr ->
+    AST <$> z3_mk_set_intersect (unContext c)
+            (fromIntegral n) astsPtr
+
+-- | Take the set difference between two sets.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#gabb49c62f70b8198362e1a29ba6d8bde1>
+mkSetDifference :: Context -> AST -> AST -> IO AST
+mkSetDifference = liftFun2 z3_mk_set_difference
+
+-- | Take the set complement between two sets.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga5c57143c9229cdf730c5103ff696590f>
+mkSetComplement :: Context -> AST -> IO AST
+mkSetComplement = liftFun1 z3_mk_set_complement
+
+-- | Check for set membership.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#gac6e516f3dce0bdd41095c6d6daf56063>
+mkSetMember :: Context
+            -> AST      -- ^ Element.
+            -> AST      -- ^ Set.
+            -> IO (AST)
+mkSetMember = liftFun2 z3_mk_set_member
+
+-- | Check for subsetness of sets.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga139c5803af0e86464adc7cedc53e7f3a>
+mkSetSubset :: Context -> AST -> AST -> IO (AST)
+mkSetSubset = liftFun2 z3_mk_set_subset
 
 ---------------------------------------------------------------------
 -- Numerals
