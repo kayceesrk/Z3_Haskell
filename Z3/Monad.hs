@@ -68,6 +68,7 @@ module Z3.Monad
   , mkFuncDecl
   , mkApp
   , mkConst
+  , mkFreshConst
   , mkTrue
   , mkFalse
   , mkEq
@@ -448,6 +449,17 @@ mkApp = liftFun2 Base.mkApp
 -- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga093c9703393f33ae282ec5e8729354ef>
 mkConst :: MonadZ3 z3 => Symbol -> Sort -> z3 AST
 mkConst = liftFun2 Base.mkConst
+
+
+-- | Declare and create a constant.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga093c9703393f33ae282ec5e8729354ef>
+mkFreshConst :: MonadZ3 z3
+             => String      -- ^ Prefix.
+             -> Sort
+             -> z3 AST
+mkFreshConst = liftFun2 Base.mkFreshConst
+
 
 -- | Create an AST node representing /true/.
 --

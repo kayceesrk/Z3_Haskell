@@ -69,6 +69,7 @@ module Z3.Base (
   , mkFuncDecl
   , mkApp
   , mkConst
+  , mkFreshConst
   , mkTrue
   , mkFalse
   , mkEq
@@ -629,8 +630,16 @@ mkApp ctx fd args =
 mkConst :: Context -> Symbol -> Sort -> IO AST
 mkConst = liftFun2 z3_mk_const
 
+-- | Declare and create a fresh constant.
+-- 
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga99cbd3e87cdd759a3d0ea43b4884ed32>
+mkFreshConst :: Context
+             -> String  -- ^ Prefix.
+             -> Sort
+             -> IO AST
+mkFreshConst = liftFun2 z3_mk_fresh_const
+
 -- TODO Constants and Applications: Z3_mk_fresh_func_decl
--- TODO Constants and Applications: Z3_mk_fresh_const
 
 -- | Create an AST node representing /true/.
 --
