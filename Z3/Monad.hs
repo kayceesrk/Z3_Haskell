@@ -183,6 +183,7 @@ module Z3.Monad
   , getDatatypeSortConstructors
   , getDatatypeSortRecognizers
   , getDeclName
+  , getSymbolString
   , getBvSortSize
   , getBool
   , getInt
@@ -1130,6 +1131,13 @@ getDeclName :: MonadZ3 z3
             => FuncDecl
             => z3 Symbol
 getDeclName = liftFun1 Base.getDeclName
+
+-- | Return the symbol name.
+-- 
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#gaf1683d9464f377e5089ce6ebf2a9bd31>
+getSymbolString :: MonadZ3 z3 => Symbol -> z3 String
+getSymbolString = liftFun1 Base.getSymbolString
+
 
 -- | Return the size of the given bit-vector sort.
 --

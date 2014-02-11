@@ -184,6 +184,7 @@ module Z3.Base (
   , getDatatypeSortConstructors
   , getDatatypeSortRecognizers
   , getDeclName
+  , getSymbolString
   , getBvSortSize
   , getSort
   , getBool
@@ -1447,6 +1448,11 @@ getDeclName :: Context -> FuncDecl -> IO Symbol
 getDeclName c decl = checkError c $
   Symbol <$> z3_get_decl_name (unContext c) (unFuncDecl decl)
 
+-- | Return the symbol name.
+-- 
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#gaf1683d9464f377e5089ce6ebf2a9bd31>
+getSymbolString :: Context -> Symbol -> IO String
+getSymbolString = liftFun1 z3_get_symbol_string
 
 -- | Return the size of the given bit-vector sort.
 --
