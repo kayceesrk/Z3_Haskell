@@ -300,7 +300,16 @@ foreign import ccall unsafe "Z3_mk_const"
 foreign import ccall unsafe "Z3_mk_fresh_const"
     z3_mk_fresh_const :: Ptr Z3_context -> Z3_string -> Ptr Z3_sort -> IO (Ptr Z3_ast)
 
--- TODO Constants and Applications: Z3_mk_fresh_func_decl
+-- | Declare a fresh constant or function.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga1f60c7eb41c5603e55a188a14dc929ec>
+foreign import ccall unsafe "Z3_mk_fresh_func_decl"
+    z3_mk_fresh_func_decl :: Ptr z3_context
+                          -> Z3_string
+                          -> CUInt
+                          -> Ptr (Ptr Z3_sort)
+                          -> Ptr Z3_sort
+                          -> IO (Ptr Z3_func_decl)
 
 ---------------------------------------------------------------------
 -- * Propositional Logic and Equality

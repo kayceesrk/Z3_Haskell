@@ -71,6 +71,7 @@ module Z3.Base (
   , mkApp
   , mkConst
   , mkFreshConst
+  , mkFreshFuncDecl
   , mkTrue
   , mkFalse
   , mkEq
@@ -624,7 +625,9 @@ mkDatatype c sym consList = checkError c $
 ---------------------------------------------------------------------
 -- Constants and Applications
 
--- | A Z3 function
+-- | Declare a constant or function.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#gaa5c5e2602a44d5f1373f077434859ca2>
 mkFuncDecl :: Context -> Symbol -> [Sort] -> Sort -> IO FuncDecl
 mkFuncDecl ctx smb dom rng =
   withArray (map unSort dom) $ \c_dom ->
@@ -661,7 +664,16 @@ mkFreshConst :: Context
              -> IO AST
 mkFreshConst = liftFun2 z3_mk_fresh_const
 
--- TODO Constants and Applications: Z3_mk_fresh_func_decl
+-- | Declare a fresh constant or function.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga1f60c7eb41c5603e55a188a14dc929ec>
+mkFreshFuncDecl :: Context -> String -> [Sort] -> Sort -> IO FuncDecl
+mkFreshFuncDecl ctx str dom rng =
+  withCString str $ \cstr ->
+  withArray (map unSort dom) $ \c_dom ->
+    checkError ctx $
+      liftVal ctx =<< z3_mk_fresh_func_decl (unContext ctx)
+                      cstr (genericLength dom) c_dom (unSort rng)
 
 -- | Create an AST node representing /true/.
 --

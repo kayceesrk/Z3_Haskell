@@ -69,6 +69,7 @@ module Z3.Monad
   , mkApp
   , mkConst
   , mkFreshConst
+  , mkFreshFuncDecl
   , mkTrue
   , mkFalse
   , mkEq
@@ -483,6 +484,15 @@ mkFreshConst :: MonadZ3 z3
              -> z3 AST
 mkFreshConst = liftFun2 Base.mkFreshConst
 
+-- | Declare a fresh constant or function.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga1f60c7eb41c5603e55a188a14dc929ec>
+mkFreshFuncDecl :: MonadZ3 z3
+                => String
+                -> [Sort]
+                -> Sort
+                -> z3 FuncDecl
+mkFreshFuncDecl = liftFun3 Base.mkFreshFuncDecl
 
 -- | Create an AST node representing /true/.
 --
