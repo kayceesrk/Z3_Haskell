@@ -1139,7 +1139,7 @@ getDatatypeSortRecognizers = liftFun1 Base.getDatatypeSortRecognizers
 -- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga741b1bf11cb92aa2ec9ef2fef73ff129>
 getDeclName :: MonadZ3 z3
             => FuncDecl
-            => z3 Symbol
+            -> z3 Symbol
 getDeclName = liftFun1 Base.getDeclName
 
 -- | Return the symbol name.
