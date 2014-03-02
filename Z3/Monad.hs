@@ -25,6 +25,7 @@ module Z3.Monad
   , evalZ3
   , evalZ3With
   , evalZ3WithEnv
+  , evalZ3WithSolver
 
   -- * Types
   , Symbol
@@ -38,6 +39,7 @@ module Z3.Monad
   , Base.Context
   , FuncInterp
   , FuncEntry
+  , Params
   , FuncModel(..)
   , Base.Solver
 
@@ -221,6 +223,11 @@ module Z3.Monad
   , reset
   , getNumScopes
 
+  -- * Parameters
+  , mkParams
+  , paramsSetBool
+  , setParams
+
   -- * String Conversion
   , ASTPrintMode(..)
   , setASTPrintMode
@@ -248,6 +255,7 @@ import Z3.Base
   , Model
   , FuncInterp
   , FuncEntry
+  , Params
   , FuncModel(..)
   , Result(..)
   , Logic(..)
@@ -339,6 +347,14 @@ evalZ3With mbLogic opts (Z3 s) =
 -- | Eval a Z3 script with default configuration options.
 evalZ3 :: Z3 a -> IO a
 evalZ3 = evalZ3With Nothing stdOpts
+
+-- | Eval a Z3 script with default solver
+evalZ3WithSolver :: Z3 a -> IO a
+evalZ3WithSolver (Z3 s) =
+  Base.withConfig $ \cfg -> do
+    Base.withContext cfg $ \ctx -> do
+      solver <- Base.mkSolver ctx
+      runReaderT s (Z3Env (Just solver) ctx)
 
 -- | Eval a Z3 script with a given context and solver.
 evalZ3WithEnv :: Base.Context
@@ -1318,6 +1334,19 @@ withModel f = do
 -- | Check whether the given logical context is consistent or not.
 check :: MonadZ3 z3 => z3 Result
 check = liftSolver0 Base.solverCheck Base.check
+
+---------------------------------------------------------------------
+-- Parameters
+
+mkParams :: MonadZ3 z3 => z3 Params
+mkParams = liftScalar Base.mkParams
+
+paramsSetBool :: MonadZ3 z3 => Params -> Symbol -> Bool -> z3 ()
+paramsSetBool = liftFun3 Base.paramsSetBool
+
+setParams :: MonadZ3 z3 => Params -> z3 ()
+setParams = liftSolver1 Base.solverSetParams
+                     (error "setParams requires solver")
 
 ---------------------------------------------------------------------
 -- String Conversion
