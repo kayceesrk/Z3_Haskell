@@ -23,6 +23,7 @@ module Z3.Monad
   , module Z3.Opts
   , Logic(..)
   , evalZ3
+  , evalZ3WithInterpolationContext
   , evalZ3With
   , evalZ3WithEnv
   , evalZ3WithSolver
@@ -347,6 +348,15 @@ evalZ3With mbLogic opts (Z3 s) =
 -- | Eval a Z3 script with default configuration options.
 evalZ3 :: Z3 a -> IO a
 evalZ3 = evalZ3With Nothing stdOpts
+
+-- | Eval a Z3 script with defualt configuration operation, and a context
+-- suitable for interpolation.
+evalZ3WithInterpolationContext :: Z3 a -> IO a
+evalZ3WithInterpolationContext (Z3 s) =
+  Base.withConfig $ \cfg -> do
+    Base.withInterpolationContext cfg $ \ctx -> do
+      mbSolver <- T.mapM (Base.mkSolverForLogic ctx) Nothing
+      runReaderT s (Z3Env mbSolver ctx)
 
 -- | Eval a Z3 script with default solver
 evalZ3WithSolver :: Z3 a -> IO a

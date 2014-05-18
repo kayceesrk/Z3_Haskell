@@ -44,8 +44,10 @@ module Z3.Base (
 
   -- * Context
   , mkContext
+  , mkInterpolationContext
   , delContext
   , withContext
+  , withInterpolationContext
   , contextToString
   , showContext
 
@@ -463,6 +465,15 @@ mkContext cfg = do
   z3_set_error_handler ctxPtr nullFunPtr
   return $ Context ctxPtr
 
+-- | Create a context using the given configuration that is suitable for generating interpolants.
+--
+-- Reference: <>
+mkInterpolationContext :: Config -> IO Context
+mkInterpolationContext cfg = do
+  ctxPtr <- z3_mk_interpolation_context (unConfig cfg)
+  z3_set_error_handler ctxPtr nullFunPtr
+  return $ Context ctxPtr
+
 -- | Delete the given logical context.
 --
 -- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga556eae80ed43ab13e1e7dc3b38c35200>
@@ -472,6 +483,10 @@ delContext = z3_del_context . unContext
 -- | Run a computation using a temporally created context.
 withContext :: Config -> (Context -> IO a) -> IO a
 withContext cfg = bracket (mkContext cfg) delContext
+
+-- | Run a computation using a temporally created interpolation context.
+withInterpolationContext :: Config -> (Context -> IO a) -> IO a
+withInterpolationContext cfg = bracket (mkInterpolationContext cfg) delContext
 
 -- | Convert the given logical context into a string.
 --
