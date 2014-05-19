@@ -244,6 +244,7 @@ module Z3.Monad
 
   -- * Interpolation
   , interpolate
+  , interpolate2
   )
   where
 
@@ -1423,3 +1424,9 @@ interpolate :: MonadZ3 z3
             => [AST]      -- ^ list of contraints
             -> z3 [AST]   -- ^ interpolants
 interpolate = liftFun1 Base.interpolate
+
+interpolate2 :: MonadZ3 z3
+             => [AST]
+             -> [AST]
+             -> z3 [AST]
+interpolate2 = liftFun2 Base.interpolate2
