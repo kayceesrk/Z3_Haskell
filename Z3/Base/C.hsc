@@ -125,6 +125,17 @@ type Z3_error_code = CInt
   , z3_exception         = Z3_EXCEPTION
   }
 
+type Z3_ast_kind = CInt
+#{enum Z3_ast_kind,
+  , z3_numeral_ast    = Z3_NUMERAL_AST
+  , z3_app_ast        = Z3_APP_AST
+  , z3_var_ast        = Z3_VAR_AST
+  , z3_quantifier_ast = Z3_QUANTIFIER_AST
+  , z3_sort_ast       = Z3_SORT_AST
+  , z3_func_decl_ast  = Z3_FUNC_DECL_AST
+  , z3_unknown_ast    = Z3_UNKNOWN_AST
+  }
+
 ---------------------------------------------------------------------
 -- * Create configuration
 
@@ -1007,6 +1018,39 @@ foreign import ccall unsafe "Z3_mk_exists"
 
 ---------------------------------------------------------------------
 -- * Accessors
+
+-- | Return the kind of the given AST.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga4c43608feea4cae363ef9c520c239a5c>
+foreign import ccall unsafe "Z3_get_ast_kind"
+    z3_get_ast_kind :: Ptr Z3_context
+                    -> Ptr Z3_ast
+                    -> IO CInt
+
+-- | Return the number of argument of an application. If t is an constant, then the number of arguments is 0.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#gae8ad520b79b46c323863bacffa0e12c0>
+foreign import ccall unsafe "Z3_get_app_num_args"
+    z3_get_app_num_args :: Ptr Z3_context
+                        -> Ptr Z3_app
+                        -> IO CUInt
+
+-- | Return the i-th argument of the given application.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga49a576b11f9f6ca4a94670e538a84c6b>
+foreign import ccall unsafe "Z3_get_app_arg"
+    z3_get_app_arg :: Ptr Z3_context
+                   -> Ptr Z3_app
+                   -> CUInt
+                   -> IO (Ptr Z3_ast)
+
+-- | Return the declaration of a constant or function application.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga4ffab51c30484a32edc65194573cfd28>
+foreign import ccall unsafe "Z3_get_app_decl"
+    z3_get_app_decl :: Ptr Z3_context
+                    -> Ptr Z3_app
+                    -> IO (Ptr Z3_func_decl)
 
 -- | Return number of constructors for datatype.
 -- 

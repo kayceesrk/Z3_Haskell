@@ -184,6 +184,7 @@ module Z3.Monad
   , mkExistsConst
 
   -- * Accessors
+  , Z3AstKind(..)
   , getDatatypeSortConstructors
   , getDatatypeSortRecognizers
   , getDeclName
@@ -193,6 +194,9 @@ module Z3.Monad
   , getInt
   , getReal
   , toApp
+  , getAstKind
+  , getAppDecl
+  , getAppArgs
 
 
   -- * Models
@@ -265,6 +269,7 @@ import Z3.Base
   , Result(..)
   , Logic(..)
   , ASTPrintMode(..)
+  , Z3AstKind(..)
   )
 import qualified Z3.Base as Base
 
@@ -1147,6 +1152,24 @@ mkExistsConst = liftFun3 Base.mkExistsConst
 
 ---------------------------------------------------------------------
 -- Accessors
+
+-- | Return the kind of the given AST.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga4c43608feea4cae363ef9c520c239a5c>
+getAstKind :: MonadZ3 z3 => AST -> z3 Z3AstKind
+getAstKind = liftFun1 Base.getAstKind
+
+-- | Return the declaration of a constant or a function application.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga4ffab51c30484a32edc65194573cfd28>
+getAppDecl :: MonadZ3 z3 => App -> z3 FuncDecl
+getAppDecl = liftFun1 Base.getAppDecl
+
+-- | Return the list of arguments in a function application.
+--
+getAppArgs :: MonadZ3 z3 => App -> z3 [AST]
+getAppArgs = liftFun1 Base.getAppArgs
+
 
 -- | Get list of constructors for datatype.
 

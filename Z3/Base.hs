@@ -195,6 +195,10 @@ module Z3.Base (
   , getInt
   , getReal
   , toApp
+  , Z3AstKind(..)
+  , getAstKind
+  , getAppDecl
+  , getAppArgs
 
   -- * Models
   , FuncModel (..)
@@ -421,6 +425,21 @@ toZ3Error e
   | otherwise                 = error "Z3.Base.toZ3Error: illegal `Z3_error_code' value"
 
 instance Exception Z3Error
+
+data Z3AstKind = NumeralAst | AppAst | VarAst | QuantifierAst
+               | SortAst | FuncDeclAst | UnknownAst
+               deriving (Show, Typeable)
+
+toZ3AstKind :: Z3_ast_kind -> Z3AstKind
+toZ3AstKind e
+  | e == z3_numeral_ast     = NumeralAst
+  | e == z3_app_ast         = AppAst
+  | e == z3_var_ast         = VarAst
+  | e == z3_quantifier_ast  = QuantifierAst
+  | e == z3_sort_ast        = SortAst
+  | e == z3_func_decl_ast   = FuncDeclAst
+  | e == z3_unknown_ast     = UnknownAst
+  | otherwise               = error "Z3.Base.toZ3AstKind: illegal `Z3_ast_kind' value"
 
 -- | Throws a z3 error
 z3Error :: Z3ErrorCode -> String -> IO ()
@@ -1496,6 +1515,29 @@ getSymbolString = liftFun1 z3_get_symbol_string
 -- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga8fc3550edace7bc046e16d1f96ddb419>
 getBvSortSize :: Context -> Sort -> IO Int
 getBvSortSize = liftFun1 z3_get_bv_sort_size
+
+-- | Return the declaration of a constant or a function application.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga4ffab51c30484a32edc65194573cfd28>
+getAppDecl :: Context -> App -> IO FuncDecl
+getAppDecl = liftFun1 z3_get_app_decl
+
+-- | Return the list of arguments in a function application
+--
+getAppArgs :: Context -> App -> IO [AST]
+getAppArgs c a = do
+  numArgs <- checkError c $ z3_get_app_num_args (unContext c) (unApp a)
+  T.mapM getAppArg [0..(numArgs-1)]
+  where
+    getAppArg :: CUInt -> IO AST
+    getAppArg idx = AST <$> z3_get_app_arg (unContext c) (unApp a) idx
+
+-- | Return the kind of the given AST.
+--
+-- Reference: <http://research.microsoft.com/en-us/um/redmond/projects/z3/group__capi.html#ga4c43608feea4cae363ef9c520c239a5c>
+getAstKind :: Context -> AST -> IO Z3AstKind
+getAstKind c a = checkError c $
+  toZ3AstKind <$> z3_get_ast_kind (unContext c) (unAST a)
 
 -- | Return the sort of an AST node.
 --
