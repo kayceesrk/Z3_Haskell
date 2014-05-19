@@ -333,6 +333,10 @@ newtype Constructor = Constructor { unConstructor :: Ptr Z3_constructor }
 newtype Model = Model { unModel :: Ptr Z3_model }
     deriving (Eq, Storable)
 
+-- | Literals
+newtype Literal = Literal { unLiteral :: Ptr Z3_literal }
+    deriving (Eq, Storable)
+
 -- | A interpretation of a function.
 newtype FuncInterp = FuncInterp { unFuncInterp :: Ptr Z3_func_interp }
     deriving Eq
@@ -2246,6 +2250,6 @@ interpolate c args =
   allocaArray (length args - 1) $ \outAstArray ->
   withArrayLen [] $ \numTheories ptheories -> do
     _ <- checkError c $ z3_interpolate (unContext c) (fromIntegral numArgs) pargs nullPtr nullPtr
-                   outAstArray nullPtr (fromIntegral (1::Int)) (fromIntegral numTheories) ptheories
+                   outAstArray nullPtr nullPtr (fromIntegral (1::Int)) (fromIntegral numTheories) ptheories
     (result::[Ptr Z3_ast]) <- peekArray (length args - 1) outAstArray
     return $ map AST result

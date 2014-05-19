@@ -70,6 +70,9 @@ data Z3_solver
 -- | A parameter set for Z3.
 data Z3_params
 
+-- | Literals
+data Z3_literal
+
 -- | Lifted Boolean type: false, undefined, true.
 type Z3_lbool = CInt
 
@@ -1541,6 +1544,7 @@ foreign import ccall unsafe "Z3_interpolate"
                    -> Ptr Z3_params     -- ^ Interpolation options (may be NULL)
                    -> Ptr (Ptr Z3_ast)  -- ^ Array to return interpolants (size at least num-1, may be NULL)
                    -> Ptr Z3_model      -- ^ Returns a Z3 model if constraints SAT (may be NULL)
+                   -> Ptr Z3_literal    -- ^ Returns relevant labels if SAT (may be NULL)
                    -> CUInt             -- ^ Incremental?
                    -> CUInt             -- ^ Number of theories.
                    -> Ptr (Ptr Z3_ast)  -- ^ Theory.
