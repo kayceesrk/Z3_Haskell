@@ -25,7 +25,7 @@ declarePow2 :: IsInt a => Z3 (Expr a -> Expr a)
 declarePow2 = do
   pow2::Expr a -> Expr a <- fun1
   -- invariants
-  assert $ forall $ \x -> (x <* 0 ==> pow2 x ==* 0)
+  assert $ forall $ \x -> (x <*. 0 ==> pow2 x ==* 0)
                           `instanceWhen` [Pat $ pow2 x]
   assert $ forall $ \x -> (x >=* 0 ==> pow2 x >* 0)
                           `instanceWhen` [Pat $ pow2 x]

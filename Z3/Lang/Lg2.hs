@@ -25,8 +25,8 @@ declareLg2 = do
   lg2::Expr a -> Expr a <- fun1
   -- invariants
   assert $ forall $ \x -> (x >* 0 ==> lg2 x >=* 0) `instanceWhen` [Pat $ lg2 x]
-  assert $ forall $ \x -> (x >* 0 ==> lg2 x <* x)  `instanceWhen` [Pat $ lg2 x]
-  assert $ forall $ \x -> 
+  assert $ forall $ \x -> (x >* 0 ==> lg2 x <*. x)  `instanceWhen` [Pat $ lg2 x]
+  assert $ forall $ \x ->
               x >* 0 ==> (lg2 (x+1) ==* lg2 x ||*  lg2 (x+1) ==* 1 + lg2 x)
   -- base cases
   assert $ lg2 1 ==* 0

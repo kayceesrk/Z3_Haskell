@@ -282,14 +282,14 @@ import Control.Exception ( Exception, bracket, throw )
 import Control.Monad ( when )
 import Data.List ( genericLength )
 import Data.Int
-import Data.Ratio ( Ratio, numerator, denominator, (%) )
+import Data.Ratio ( numerator, denominator, (%) )
 import Data.Traversable ( Traversable )
 import qualified Data.Traversable as T
 import Data.Typeable ( Typeable )
 import Data.Word
 import Foreign hiding ( toBool, newForeignPtr )
 import Foreign.C
-  ( CDouble, CInt, CUInt, CLLong, CULLong, CString
+  ( CDouble, CUInt, CLLong, CULLong, CString
   , peekCString
   , withCString )
 import Foreign.Concurrent
@@ -336,10 +336,6 @@ newtype Constructor = Constructor { unConstructor :: Ptr Z3_constructor }
 
 -- | A model for the constraints asserted into the logical context.
 newtype Model = Model { unModel :: Ptr Z3_model }
-    deriving (Eq, Storable)
-
--- | Literals
-newtype Literal = Literal { unLiteral :: Ptr Z3_literal }
     deriving (Eq, Storable)
 
 -- | A interpretation of a function.
@@ -1324,39 +1320,6 @@ mkInt :: Integral a => Context -> a -> IO AST
 mkInt c n = mkIntSort c >>= mkNumeral c n_str
   where n_str = show $ toInteger n
 
-{-# INLINE mkIntZ3 #-}
-mkIntZ3 :: Context -> Int32 -> Sort -> IO AST
-mkIntZ3 c n s = marshal z3_mk_int c $ withVal s . withIntegral n
-
-{-# INLINE mkUnsignedIntZ3 #-}
-mkUnsignedIntZ3 :: Context -> Word32 -> Sort -> IO AST
-mkUnsignedIntZ3 c n s = marshal z3_mk_unsigned_int c $
-  withVal s . withIntegral n
-
-{-# INLINE mkInt64Z3 #-}
-mkInt64Z3 :: Context -> Int64 -> Sort -> IO AST
-mkInt64Z3 = liftFun2 z3_mk_int64
-
-{-# INLINE mkUnsignedInt64Z3 #-}
-mkUnsignedInt64Z3 :: Context -> Word64 -> Sort -> IO AST
-mkUnsignedInt64Z3 = liftFun2 z3_mk_unsigned_int64
-
-{-# RULES "mkInt/mkInt_IntZ3" mkInt = mkInt_IntZ3 #-}
-mkInt_IntZ3 :: Context -> Int32 -> IO AST
-mkInt_IntZ3 c n = mkIntSort c >>= mkIntZ3 c n
-
-{-# RULES "mkInt/mkInt_UnsignedIntZ3" mkInt = mkInt_UnsignedIntZ3 #-}
-mkInt_UnsignedIntZ3 :: Context -> Word32 -> IO AST
-mkInt_UnsignedIntZ3 c n = mkIntSort c >>= mkUnsignedIntZ3 c n
-
-{-# RULES "mkInt/mkInt_Int64Z3" mkInt = mkInt_Int64Z3 #-}
-mkInt_Int64Z3 :: Context -> Int64 -> IO AST
-mkInt_Int64Z3 c n = mkIntSort c >>= mkInt64Z3 c n
-
-{-# RULES "mkInt/mkInt_UnsignedInt64Z3" mkInt = mkInt_UnsignedInt64Z3 #-}
-mkInt_UnsignedInt64Z3 :: Context -> Word64 -> IO AST
-mkInt_UnsignedInt64Z3 c n = mkIntSort c >>= mkUnsignedInt64Z3 c n
-
 -------------------------------------------------
 -- Numerals / Reals
 
@@ -1367,28 +1330,6 @@ mkReal c n = mkRealSort c >>= mkNumeral c n_str
         r_n = toInteger $ numerator r
         r_d = toInteger $ denominator r
         n_str = show r_n ++ " / " ++ show r_d
-
-{-# RULES "mkReal/mkRealZ3" mkReal = mkRealZ3 #-}
-mkRealZ3 :: Context -> Ratio Int32 -> IO AST
-mkRealZ3 c r = checkError c $ liftVal c =<< z3_mk_real (unContext c) n d
-  where n = (fromIntegral $ numerator r)   :: CInt
-        d = (fromIntegral $ denominator r) :: CInt
-
-{-# RULES "mkReal/mkReal_IntZ3" mkReal = mkReal_IntZ3 #-}
-mkReal_IntZ3 :: Context -> Int32 -> IO AST
-mkReal_IntZ3 c n = mkRealSort c >>= mkIntZ3 c n
-
-{-# RULES "mkReal/mkReal_UnsignedIntZ3" mkReal = mkReal_UnsignedIntZ3 #-}
-mkReal_UnsignedIntZ3 :: Context -> Word32 -> IO AST
-mkReal_UnsignedIntZ3 c n = mkRealSort c >>= mkUnsignedIntZ3 c n
-
-{-# RULES "mkReal/mkReal_Int64Z3" mkReal = mkReal_Int64Z3 #-}
-mkReal_Int64Z3 :: Context -> Int64 -> IO AST
-mkReal_Int64Z3 c n = mkRealSort c >>= mkInt64Z3 c n
-
-{-# RULES "mkReal/mkReal_UnsignedInt64Z3" mkReal = mkReal_UnsignedInt64Z3 #-}
-mkReal_UnsignedInt64Z3 :: Context -> Word64 -> IO AST
-mkReal_UnsignedInt64Z3 c n = mkRealSort c >>= mkUnsignedInt64Z3 c n
 
 ---------------------------------------------------------------------
 -- Quantifiers
@@ -2132,9 +2073,6 @@ parseSmtlib2String c str sortList declList = checkError c $
 
 ---------------------------------------------------------------------
 -- Lifting
-
-withIntegral :: (Integral a, Integral b) => a -> (b -> r) -> r
-withIntegral x f = f (fromIntegral x)
 
 withAstArray :: [AST] -> (CUInt -> Ptr (Ptr Z3_ast) -> IO a) -> IO a
 withAstArray as f = withArrayLen (map unAST as) $ \n -> f (fromIntegral n)

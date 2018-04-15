@@ -210,7 +210,7 @@ data CmpOpI = Le | Lt | Ge | Gt
 -- Typecheck monad
 
 newtype TCM a = TCM { unTCM :: RWS Context [TCC] () a }
-    deriving Monad
+    deriving (Functor, Applicative, Monad)
 
 type TCC = Expr Bool
 

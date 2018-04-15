@@ -80,7 +80,7 @@ module Z3.Lang.Prelude (
     , (//), (%*), (%%)
     , divides
     , (==*), (/=*)
-    , (<=*), (<*)
+    , (<=*), (<*.)
     , (>=*), (>*)
     , min_, max_
     , ite
@@ -294,7 +294,7 @@ instance IsReal a => Fractional (Expr a) where
   fromRational = literal . fromRational
 
 infixl 7  //, %*, %%
-infix  4  ==*, /=*, <*, <=*, >=*, >*
+infix  4  ==*, /=*, <*., <=*, >=*, >*
 infixr 3  &&*, ||*, `xor`
 infixr 2  `implies`, `iff`, ==>, <=>
 
@@ -417,8 +417,8 @@ e1 /=* e2 = CmpE Distinct [e1,e2]
 (<=*) = CmpI Le
 
 -- | Less than.
-(<*) :: IsNum a => Expr a -> Expr a -> Expr Bool
-(<*) = CmpI Lt
+(<*.) :: IsNum a => Expr a -> Expr a -> Expr Bool
+(<*.) = CmpI Lt
 
 -- | Greater or equals than.
 (>=*) :: IsNum a => Expr a -> Expr a -> Expr Bool
